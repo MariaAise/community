@@ -1,14 +1,18 @@
 import { useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams, Navigate } from 'react-router-dom';
 import LocationPicker from '../components/LocationPicker';
 import DaySelector from '../components/DaySelector';
 import { NOTICE_OPTIONS } from '../lib/constants';
-import { savePost } from '../lib/store';
+import { createRide } from '../lib/store';
+import { useAuth } from '../lib/AuthContext';
 
 export default function NewPost() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const initialType = searchParams.get('type') || 'offering';
+  const { user, loading } = useAuth();
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState('');
 
   const [form, setForm] = useState({
     type: initialType,
@@ -26,12 +30,23 @@ export default function NewPost() {
     setForm((prev) => ({ ...prev, [field]: value }));
   }
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
     if (!form.name.trim()) return;
-    savePost(form);
-    navigate('/browse');
+    setSubmitting(true);
+    setError('');
+    try {
+      await createRide(form, user.id);
+      navigate('/browse');
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setSubmitting(false);
+    }
   }
+
+  if (loading) return null;
+  if (!user) return <Navigate to="/auth" />;
 
   return (
     <div className="max-w-xl mx-auto">
@@ -40,6 +55,12 @@ export default function NewPost() {
       </h1>
 
       <form onSubmit={handleSubmit} className="space-y-6">
+        {error && (
+          <p className="text-sm text-red-600 bg-red-50 rounded-lg px-3 py-2">
+            {error}
+          </p>
+        )}
+
         {/* Type toggle */}
         <div className="flex gap-2">
           {['offering', 'need'].map((t) => (
@@ -165,9 +186,10 @@ export default function NewPost() {
 
         <button
           type="submit"
-          className="w-full py-3 rounded-xl bg-emerald-600 text-white font-semibold hover:bg-emerald-700 transition-colors shadow-sm"
+          disabled={submitting}
+          className="w-full py-3 rounded-xl bg-emerald-600 text-white font-semibold hover:bg-emerald-700 transition-colors shadow-sm disabled:opacity-50"
         >
-          Post ride
+          {submitting ? 'Posting...' : 'Post ride'}
         </button>
       </form>
     </div>

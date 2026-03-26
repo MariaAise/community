@@ -1,34 +1,48 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import RideCard from '../components/RideCard';
-import { getPosts, deletePost } from '../lib/store';
+import { getRides, deleteRide } from '../lib/store';
+import { useAuth } from '../lib/AuthContext';
 
 export default function Browse() {
-  const [posts, setPosts] = useState([]);
+  const [rides, setRides] = useState([]);
   const [filter, setFilter] = useState('all');
+  const [loading, setLoading] = useState(true);
+  const { user } = useAuth();
 
   useEffect(() => {
-    setPosts(getPosts());
-  }, []);
+    loadRides();
+  }, [filter]);
 
-  function handleDelete(id) {
-    deletePost(id);
-    setPosts(getPosts());
+  async function loadRides() {
+    setLoading(true);
+    try {
+      const data = await getRides(filter);
+      setRides(data);
+    } catch {
+      setRides([]);
+    } finally {
+      setLoading(false);
+    }
   }
 
-  const filtered =
-    filter === 'all' ? posts : posts.filter((p) => p.type === filter);
+  async function handleDelete(id) {
+    await deleteRide(id);
+    loadRides();
+  }
 
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold text-gray-900">Browse Rides</h1>
-        <Link
-          to="/new"
-          className="px-4 py-2 rounded-lg bg-emerald-600 text-white text-sm font-medium hover:bg-emerald-700 transition-colors"
-        >
-          + Post a ride
-        </Link>
+        {user && (
+          <Link
+            to="/new"
+            className="px-4 py-2 rounded-lg bg-emerald-600 text-white text-sm font-medium hover:bg-emerald-700 transition-colors"
+          >
+            + Post a ride
+          </Link>
+        )}
       </div>
 
       <div className="flex gap-2 mb-6">
@@ -51,17 +65,29 @@ export default function Browse() {
         ))}
       </div>
 
-      {filtered.length === 0 ? (
+      {loading ? (
+        <div className="text-center py-16 text-gray-400">Loading...</div>
+      ) : rides.length === 0 ? (
         <div className="text-center py-16 text-gray-500">
           <p className="text-lg mb-2">No rides posted yet</p>
-          <Link to="/new" className="text-emerald-600 font-medium hover:underline">
-            Be the first to post
-          </Link>
+          {user ? (
+            <Link to="/new" className="text-emerald-600 font-medium hover:underline">
+              Be the first to post
+            </Link>
+          ) : (
+            <Link to="/auth" className="text-emerald-600 font-medium hover:underline">
+              Sign in to post a ride
+            </Link>
+          )}
         </div>
       ) : (
         <div className="grid gap-4 sm:grid-cols-2">
-          {filtered.map((post) => (
-            <RideCard key={post.id} post={post} onDelete={handleDelete} />
+          {rides.map((ride) => (
+            <RideCard
+              key={ride.id}
+              post={ride}
+              onDelete={user?.id === ride.userId ? handleDelete : undefined}
+            />
           ))}
         </div>
       )}
