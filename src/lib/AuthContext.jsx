@@ -23,7 +23,12 @@ export function AuthProvider({ children }) {
   }, []);
 
   async function signUp(email, password) {
-    const { error } = await supabase.auth.signUp({ email, password });
+    const siteUrl = window.location.origin + import.meta.env.BASE_URL;
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: { emailRedirectTo: siteUrl },
+    });
     if (error) throw error;
   }
 
