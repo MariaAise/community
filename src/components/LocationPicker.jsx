@@ -57,20 +57,20 @@ function MapClickHandler({ onSelect }) {
 }
 
 export default function LocationPicker({ label, value, onChange }) {
-  const [center, setCenter] = useState({ lat: 51.505, lng: -0.09 });
+  const [center] = useState({ lat: 51.505, lng: -0.09 });
   const map = useMap(label);
 
   useEffect(() => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (pos) => {
-          const loc = { lat: pos.coords.latitude, lng: pos.coords.longitude };
-          setCenter(loc);
-        },
-        () => {}
-      );
-    }
-  }, []);
+    if (!map || !navigator.geolocation) return;
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const loc = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+        map.panTo(loc);
+        map.setZoom(13);
+      },
+      () => {}
+    );
+  }, [map]);
 
   const handleSelect = useCallback(
     (coords, name) => {
