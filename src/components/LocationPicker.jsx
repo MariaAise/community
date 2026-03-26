@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef, useCallback } from 'react';
 import {
   Map,
-  AdvancedMarker,
+  Marker,
   useMap,
   useMapsLibrary,
 } from '@vis.gl/react-google-maps';
@@ -99,11 +99,10 @@ export default function LocationPicker({ label, value, onChange }) {
           gestureHandling="greedy"
           disableDefaultUI
           zoomControl
-          mapId="shareride"
           style={{ width: '100%', height: '100%' }}
         >
           <MapClickHandler onSelect={handleSelect} />
-          {markerPos && <AdvancedMarker position={markerPos} />}
+          {markerPos && <Marker position={markerPos} />}
         </Map>
       </div>
       {value?.name && (
