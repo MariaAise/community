@@ -1,67 +1,49 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { Map, Marker, useMap, useMapsLibrary } from '@vis.gl/react-google-maps';
 
 export default function AreaPicker({ value, onChange }) {
   const [center] = useState({ lat: 51.505, lng: -0.09 });
   const [markerPos, setMarkerPos] = useState(null);
   const [locating, setLocating] = useState(false);
+  const [geolocated, setGeolocated] = useState(false);
   const map = useMap('area-picker');
   const geocoding = useMapsLibrary('geocoding');
+  const onChangeRef = useRef(onChange);
+  onChangeRef.current = onChange;
 
-  const reverseGeocode = useCallback(
-    (lat, lng) => {
-      if (!geocoding) return;
-      const geocoder = new geocoding.Geocoder();
-      geocoder.geocode({ location: { lat, lng } }, (results, status) => {
-        if (status !== 'OK' || !results?.[0]) return;
+  function reverseGeocode(lat, lng) {
+    if (!geocoding) return;
+    const geocoder = new geocoding.Geocoder();
+    geocoder.geocode({ location: { lat, lng } }, (results, status) => {
+      if (status !== 'OK' || !results?.[0]) return;
 
-        // Look for postal_code, then suburb/locality, then route
-        let area = '';
-        for (const result of results) {
-          for (const component of result.address_components) {
-            if (component.types.includes('postal_code')) {
-              area = component.long_name;
-            }
-            if (
-              !area &&
-              (component.types.includes('locality') ||
-                component.types.includes('sublocality') ||
-                component.types.includes('neighborhood'))
-            ) {
-              area = component.long_name;
-            }
+      let suburb = '';
+      let postcode = '';
+      for (const result of results) {
+        for (const component of result.address_components) {
+          if (component.types.includes('postal_code') && !postcode) {
+            postcode = component.long_name;
           }
-          if (area) break;
-        }
-
-        // Combine suburb + postcode if both found
-        let suburb = '';
-        let postcode = '';
-        for (const result of results) {
-          for (const component of result.address_components) {
-            if (component.types.includes('postal_code') && !postcode) {
-              postcode = component.long_name;
-            }
-            if (
-              !suburb &&
-              (component.types.includes('locality') ||
-                component.types.includes('sublocality') ||
-                component.types.includes('neighborhood'))
-            ) {
-              suburb = component.long_name;
-            }
+          if (
+            !suburb &&
+            (component.types.includes('locality') ||
+              component.types.includes('sublocality') ||
+              component.types.includes('neighborhood'))
+          ) {
+            suburb = component.long_name;
           }
         }
+      }
 
-        const display = [suburb, postcode].filter(Boolean).join(', ') || area;
-        if (display) onChange(display);
-      });
-    },
-    [geocoding, onChange]
-  );
+      const display = [suburb, postcode].filter(Boolean).join(', ');
+      if (display) onChangeRef.current(display);
+    });
+  }
 
+  // Auto-locate on mount — runs once when map + geocoding are ready
   useEffect(() => {
-    if (!map || !navigator.geolocation) return;
+    if (!map || !geocoding || geolocated || !navigator.geolocation) return;
+    setGeolocated(true);
     setLocating(true);
     navigator.geolocation.getCurrentPosition(
       (pos) => {
@@ -74,10 +56,11 @@ export default function AreaPicker({ value, onChange }) {
       },
       () => setLocating(false)
     );
-  }, [map, reverseGeocode]);
+  }, [map, geocoding, geolocated]);
 
+  // Click to pick a different spot
   useEffect(() => {
-    if (!map) return;
+    if (!map || !geocoding) return;
     const listener = map.addListener('click', (e) => {
       if (!e.latLng) return;
       const lat = e.latLng.lat();
@@ -86,7 +69,7 @@ export default function AreaPicker({ value, onChange }) {
       reverseGeocode(lat, lng);
     });
     return () => listener.remove();
-  }, [map, reverseGeocode]);
+  }, [map, geocoding]);
 
   return (
     <div className="space-y-2">
