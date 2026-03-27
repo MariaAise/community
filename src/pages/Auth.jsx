@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../lib/AuthContext';
+import AreaPicker from '../components/AreaPicker';
 
 export default function Auth() {
   const [isSignUp, setIsSignUp] = useState(false);
@@ -70,21 +71,7 @@ export default function Auth() {
                 placeholder="e.g. Maria"
               />
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Your area / neighbourhood
-              </label>
-              <input
-                type="text"
-                value={area}
-                onChange={(e) => setArea(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                placeholder="e.g. Shoreditch, East London"
-              />
-              <p className="text-xs text-gray-400 mt-1">
-                Visible to other users so they can find neighbours nearby
-              </p>
-            </div>
+            <AreaPicker value={area} onChange={setArea} />
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Phone number
