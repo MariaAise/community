@@ -1,0 +1,13 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <script>
+      // SPA redirect for GitHub Pages
+      // Stores the path and redirects to index.html
+      sessionStorage.setItem('spa-redirect', location.pathname + location.search + location.hash);
+      location.replace('/community/');
+    </script>
+  </head>
+  <body></body>
+</html>

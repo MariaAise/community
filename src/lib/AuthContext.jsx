@@ -23,6 +23,8 @@ export function AuthProvider({ children }) {
       setUser(u);
       if (u) loadProfile(u.id);
       setLoading(false);
+    }).catch(() => {
+      setLoading(false);
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
@@ -31,6 +33,7 @@ export function AuthProvider({ children }) {
         setUser(u);
         if (u) loadProfile(u.id);
         else setProfile(null);
+        setLoading(false);
       }
     );
 
