@@ -37,7 +37,7 @@ export function AuthProvider({ children }) {
     return () => subscription.unsubscribe();
   }, []);
 
-  async function signUp(email, password, name, area) {
+  async function signUp(email, password, name, area, phone) {
     const siteUrl = window.location.origin + import.meta.env.BASE_URL;
     const { data, error } = await supabase.auth.signUp({
       email,
@@ -55,6 +55,7 @@ export function AuthProvider({ children }) {
         id: data.user.id,
         name,
         area: area || null,
+        phone: phone || null,
       });
     }
   }

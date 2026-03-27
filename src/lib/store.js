@@ -3,7 +3,7 @@ import { supabase } from './supabase';
 export async function getRides(filter) {
   let query = supabase
     .from('rides')
-    .select('*, profiles:user_id(name, area)')
+    .select('*, profiles:user_id(name, area, phone)')
     .order('created_at', { ascending: false });
 
   if (filter && filter !== 'all') {
@@ -63,6 +63,7 @@ function rowToRide(row) {
     type: row.type,
     name: row.profiles?.name || row.name,
     area: row.profiles?.area || null,
+    phone: row.profiles?.phone || null,
     from: row.from_name
       ? { coords: [row.from_lat, row.from_lng], name: row.from_name }
       : null,

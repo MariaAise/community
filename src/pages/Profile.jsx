@@ -6,6 +6,7 @@ export default function Profile() {
   const { user, profile, loading, updateProfile } = useAuth();
   const [name, setName] = useState('');
   const [area, setArea] = useState('');
+  const [phone, setPhone] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
@@ -14,6 +15,7 @@ export default function Profile() {
     if (profile) {
       setName(profile.name || '');
       setArea(profile.area || '');
+      setPhone(profile.phone || '');
     }
   }, [profile]);
 
@@ -23,7 +25,7 @@ export default function Profile() {
     setError('');
     setMessage('');
     try {
-      await updateProfile({ name, area: area || null });
+      await updateProfile({ name, area: area || null, phone: phone || null });
       setMessage('Profile updated.');
     } catch (err) {
       setError(err.message);
@@ -89,6 +91,22 @@ export default function Profile() {
           />
           <p className="text-xs text-gray-400 mt-1">
             Visible to other users so they can find neighbours nearby
+          </p>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Phone number
+          </label>
+          <input
+            type="tel"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+            placeholder="e.g. +44 7700 900000"
+          />
+          <p className="text-xs text-gray-400 mt-1">
+            Visible to signed-in users on your ride posts
           </p>
         </div>
 

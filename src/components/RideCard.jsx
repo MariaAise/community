@@ -1,5 +1,8 @@
+import { useAuth } from '../lib/AuthContext';
+
 export default function RideCard({ post, onDelete }) {
   const isOffering = post.type === 'offering';
+  const { user } = useAuth();
 
   return (
     <div className="bg-white rounded-xl border border-gray-200 p-5 hover:shadow-md transition-shadow">
@@ -54,6 +57,14 @@ export default function RideCard({ post, onDelete }) {
             <p>
               <span className="font-medium">Notice:</span> {post.notice || 'Any time'}
             </p>
+            {user && post.phone && (
+              <p>
+                <span className="font-medium">Phone:</span>{' '}
+                <a href={`tel:${post.phone}`} className="text-emerald-600 hover:underline">
+                  {post.phone}
+                </a>
+              </p>
+            )}
           </div>
 
           {post.notes && (
