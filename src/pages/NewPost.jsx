@@ -10,7 +10,7 @@ export default function NewPost() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const initialType = searchParams.get('type') || 'offering';
-  const { user, loading } = useAuth();
+  const { user, profile, loading } = useAuth();
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
 
@@ -32,11 +32,10 @@ export default function NewPost() {
 
   async function handleSubmit(e) {
     e.preventDefault();
-    if (!form.name.trim()) return;
     setSubmitting(true);
     setError('');
     try {
-      await createRide(form, user.id);
+      await createRide({ ...form, name: profile?.name || '' }, user.id);
       navigate('/browse');
     } catch (err) {
       setError(err.message);
@@ -79,19 +78,22 @@ export default function NewPost() {
           ))}
         </div>
 
-        {/* Name */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Your name
-          </label>
-          <input
-            type="text"
-            required
-            value={form.name}
-            onChange={(e) => update('name', e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-            placeholder="e.g. Maria"
-          />
+        {/* Name from profile */}
+        <div className="flex items-center gap-3 bg-gray-50 rounded-lg px-4 py-3">
+          <div>
+            <p className="text-sm font-medium text-gray-900">
+              {profile?.name || 'No name set'}
+            </p>
+            {profile?.area && (
+              <p className="text-xs text-gray-500">{profile.area}</p>
+            )}
+          </div>
+          <a
+            href={`${import.meta.env.BASE_URL}profile`}
+            className="ml-auto text-xs text-emerald-600 hover:underline"
+          >
+            Edit profile
+          </a>
         </div>
 
         {/* Locations */}

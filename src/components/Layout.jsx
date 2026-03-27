@@ -3,7 +3,7 @@ import { useAuth } from '../lib/AuthContext';
 
 export default function Layout() {
   const { pathname } = useLocation();
-  const { user, signOut } = useAuth();
+  const { user, profile, signOut } = useAuth();
   const navigate = useNavigate();
 
   const navLinks = [
@@ -40,12 +40,24 @@ export default function Layout() {
                 </Link>
               ))}
               {user ? (
-                <button
-                  onClick={handleSignOut}
-                  className="ml-2 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-colors"
-                >
-                  Sign out
-                </button>
+                <>
+                  <Link
+                    to="/profile"
+                    className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                      pathname === '/profile'
+                        ? 'bg-emerald-50 text-emerald-700'
+                        : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                    }`}
+                  >
+                    {profile?.name || 'Profile'}
+                  </Link>
+                  <button
+                    onClick={handleSignOut}
+                    className="px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-colors"
+                  >
+                    Sign out
+                  </button>
+                </>
               ) : (
                 <Link
                   to="/auth"

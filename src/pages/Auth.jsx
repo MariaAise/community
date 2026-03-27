@@ -6,6 +6,8 @@ export default function Auth() {
   const [isSignUp, setIsSignUp] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [name, setName] = useState('');
+  const [area, setArea] = useState('');
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -20,7 +22,7 @@ export default function Auth() {
 
     try {
       if (isSignUp) {
-        await signUp(email, password);
+        await signUp(email, password, name, area);
         setMessage('Check your email to confirm your account, then sign in.');
         setIsSignUp(false);
       } else {
@@ -50,6 +52,39 @@ export default function Auth() {
           <p className="text-sm text-emerald-700 bg-emerald-50 rounded-lg px-3 py-2">
             {message}
           </p>
+        )}
+
+        {isSignUp && (
+          <>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Your name
+              </label>
+              <input
+                type="text"
+                required
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                placeholder="e.g. Maria"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Your area / neighbourhood
+              </label>
+              <input
+                type="text"
+                value={area}
+                onChange={(e) => setArea(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                placeholder="e.g. Shoreditch, East London"
+              />
+              <p className="text-xs text-gray-400 mt-1">
+                Visible to other users so they can find neighbours nearby
+              </p>
+            </div>
+          </>
         )}
 
         <div>

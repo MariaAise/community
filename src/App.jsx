@@ -6,6 +6,7 @@ import Home from './pages/Home';
 import NewPost from './pages/NewPost';
 import Browse from './pages/Browse';
 import Auth from './pages/Auth';
+import Profile from './pages/Profile';
 
 const GOOGLE_MAPS_KEY = import.meta.env.VITE_GOOGLE_MAPS_KEY;
 
@@ -19,6 +20,7 @@ export default function App() {
             <Route path="/new" element={<NewPost />} />
             <Route path="/browse" element={<Browse />} />
             <Route path="/auth" element={<Auth />} />
+            <Route path="/profile" element={<Profile />} />
           </Route>
         </Routes>
       </AuthProvider>

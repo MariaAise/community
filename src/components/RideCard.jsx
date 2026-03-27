@@ -26,7 +26,14 @@ export default function RideCard({ post, onDelete }) {
             )}
           </div>
 
-          <h3 className="font-semibold text-gray-900 mb-1">{post.name}</h3>
+          <h3 className="font-semibold text-gray-900 mb-1">
+            {post.name}
+            {post.area && (
+              <span className="ml-2 text-xs font-normal text-gray-400">
+                {post.area}
+              </span>
+            )}
+          </h3>
 
           <div className="text-sm text-gray-600 space-y-1">
             <p>
